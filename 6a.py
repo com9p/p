@@ -19,12 +19,11 @@ def linear_reg(df): X, y = df[['X']], df['Y']; model = LinearRegression().fit(X,
 def gaussian_kernel(x, X, tau): return np.exp(-np.sum((x - X)**2, axis=1) / (2 * tau**2))
 
 def lwr(X, y, tau=0.5):
-    X_aug = np.hstack([np.ones((X.shape[0], 1)), X])
-    x_vals = np.linspace(X.min(), X.max(), 100); y_pred = []
+    X_aug, x_vals, y_pred = np.c_[np.ones(X.shape[0]), X], np.linspace(X.min(), X.max(), 100), []
     for x in x_vals:
-        x_vec = np.array([1, x]); w = np.diag(gaussian_kernel([[x]], X, tau))
-        theta = np.linalg.pinv(X_aug.T @ w @ X_aug) @ (X_aug.T @ w @ y)
-        y_pred.append(x_vec @ theta)
+        W = np.diag(gaussian_kernel([[x]], X, tau))
+        theta = np.linalg.pinv(X_aug.T @ W @ X_aug) @ (X_aug.T @ W @ y)
+        y_pred.append([1, x] @ theta)
     plot(X, y, y_pred, 'Locally Weighted Regression')
 
 def poly_reg(df, deg):
